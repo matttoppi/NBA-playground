@@ -18,7 +18,7 @@ def main():
     player_name = 'Jayson Tatum'
     player_id = get_player_id(player_name)
     season = '2022-23'
-    print("Player ID for " + player_name + " is " + player_id)
+    # print("Player ID for " + player_name + " is " + player_id)
 
     print("\n\n\n------\nGET TRUE SHOOTING PERCENTAGE (using player_id from above\n")
     true_shooting_percentage = calculate_true_shooting_percentage(player_id, season)
@@ -35,7 +35,7 @@ def main():
     print("\n\n\n------\nGET SEASON ID FROM SEASON\n")
     season_id = get_season_id(season)
     print(f"The season ID for the 1962-63 season is {season_id}")
-
+    # did this save
     #  get effective field goal percentage for a player
     print("\n\n\n------\nGET EFFECTIVE FIELD GOAL PERCENTAGE\n")
     player_name = 'Michael Jordan'

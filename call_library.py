@@ -317,3 +317,38 @@ def calculate_effective_field_goal_percentage(player_id, season):
     # calculate effective field goal percentage
     effective_field_goal_percentage = ((games['FGM'] + 0.5 * games['FG3M']) / games['FGA']).mean()
     return effective_field_goal_percentage
+
+
+# method that puts the scores of every game in a season into a CSV file
+# def get_season_scores():
+#     """
+#     takes season as a string
+#     returns a list of game objects
+#     :param season:
+#     :return:
+#     """
+#     from nba_api.stats.endpoints import leaguegamelog
+#
+#     season_id = get_season_id(2014)
+#
+#     leaguegamelog = leaguegamelog.LeagueGameLog(season=season_id)
+#     games = leaguegamelog.get_data_frames()[0]
+#     print(games)
+#     return games
+
+
+
+#  calculates box plus minus for a player using the formula from https://www.basketball-reference.com/about/bpm.html
+def calculate_box_plus_minues():
+    """
+    takes player ID as a string
+    returns BPM as a float
+    :param player_id:
+    :return:
+    """
+    from nba_api.stats.endpoints import playergamelog
+
+    playergamelog = playergamelog.PlayerGameLog(player_id=player_id)
+    games = playergamelog.get_data_frames()[0]
+
+#     calculate BPM using regression formula
