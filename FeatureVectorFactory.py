@@ -54,7 +54,8 @@ class RaptorVectorFactory:
 
 
 class TeamDataFeatureFactory:
-    """This class is meant to be used to load in data from our CSV files and create feature vectors out of them."""
+    """This class is meant to be used to load in data from our CSV files and create feature vectors for
+    team stats out of them."""
 
     def __init__(self, filename, debug=True):
         """Initialize the factory by providing it with the file to read data from"""
@@ -62,6 +63,7 @@ class TeamDataFeatureFactory:
         self.dataframe = pd.read_csv(self.file)  # The overall data frame containing all teams data for all seasons
         self.seasons = []  # List of data frames split by season
         self.debug = debug
+        # Can also put split_by_season in here since you have to do it anyway
 
     def split_by_season(self):
         """
@@ -69,7 +71,7 @@ class TeamDataFeatureFactory:
         :returns No return, just appends the data to the self.seasons parameter
         """
         if len(self.seasons) != 0:
-            print("Seasons list already has data in it! split_by_season() exiting...")
+            print("Seasons list already has data in it! Team split_by_season() exiting...")
         else:
             for x in range(14, 23):
                 mask = self.dataframe['SEASON'] == x  # Split the data frame to only have the current season rows
@@ -129,9 +131,62 @@ class TeamDataFeatureFactory:
         bigtensor = torch.empty(1)  # Aggregate tensor that we will stack each new season onto
         for season in self.seasons:
             x = self.create_single_season_features(season)
+            if x is None:
+                print("Tensor returned from single season creator was None! Exiting create_team_features...")
+                return None
             torch.stack((bigtensor, x))
 
         if self.debug:
             print(f"Function create_team_features() tensor size: {bigtensor.size()}")
             print(f"Expected size of returned tensor: (10, 30, ~18)")
         return bigtensor
+
+
+class RMPFeatureFactory:
+    """This class is meant to be used to load in data from our CSV files and create feature vectors for
+    player RPM stats out of them."""
+    def __init__(self, filename, debug=True):
+        """Initialize the factory by providing it with the file to read data from"""
+        self.file = filename  # PATH to the CSV file containing team data
+        self.dataframe = pd.read_csv(self.file)  # The overall data frame containing all teams data for all seasons
+        self.seasons = []  # List of data frames split by season
+        self.debug = debug
+        # Can also put split_by_season in here since you have to do it anyway
+
+    def split_by_season(self):
+        """
+        This method takes the data from the CSV file and splits it up into matrices that represent each season
+        :returns No return, just appends the data to the self.seasons parameter
+        """
+        if len(self.seasons) != 0:
+            print("Seasons list already has data in it! RPM split_by_season() exiting...")
+        else:
+            for x in range(14, 23):
+                mask = self.dataframe['Season'] == x  # Split the data frame to only have the current season rows
+                self.seasons.append(self.dataframe[mask])  # Append the current season to the list of split seasons
+
+    def create_single_season_features(self, season):
+        """
+        Create a feature vector representing every player's RPM stats for a given season
+        :param season: The season dataframe being turned into a tensor
+        :return: A PyTorch tensor of size (numPlayers (variable per season),
+        numFeatures (~4 not including names/labels))
+        """
+        if len(season) == 0:
+            print("Empty season data frame provided to create_single_season_features! Exiting...")
+            return None
+        else:
+            orpm = torch.tensor(season['ORPM'].values)
+            drpm = torch.tensor(season['DRPM'].values)
+            rpm = torch.tensor(season['RPM'].values)
+            wins = torch.tensor(season['WINS'].values)
+
+            stats = (orpm, drpm, rpm, wins)
+
+            seasontensor = torch.stack(stats)
+
+            if self.debug:
+                print(f"Function create_single_season_features() tensor size: {seasontensor.size()}")
+                print(f"Expected size of returned tensor: (#playersInSeason, ~4)")
+
+            return seasontensor
