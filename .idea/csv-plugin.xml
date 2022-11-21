@@ -17,6 +17,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/preVectorDATA/RaptorData (2014-2023) - raptor_data14-23.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/raptor_data.csv">
           <value>
             <Attribute>

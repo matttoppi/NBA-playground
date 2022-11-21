@@ -291,7 +291,7 @@ def calculate_true_shooting_percentage(player_id, season):
     """
     from nba_api.stats.endpoints import playergamelog
 
-    #  only get data from the regular season
+    #  only get preVectorDATA from the regular season
     playergamelog = playergamelog.PlayerGameLog(player_id=player_id, season=season)
     games = playergamelog.get_data_frames()[0]
 
@@ -310,7 +310,7 @@ def calculate_effective_field_goal_percentage(player_id, season):
     """
     from nba_api.stats.endpoints import playergamelog
 
-    #  only get data from the regular season
+    #  only get preVectorDATA from the regular season
     playergamelog = playergamelog.PlayerGameLog(player_id=player_id, season=season)
     games = playergamelog.get_data_frames()[0]
 

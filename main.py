@@ -6,10 +6,17 @@ from nba_api.stats.endpoints import leaguegamefinder
 from nba_api.stats.static import teams
 
 from call_library import *
+from FeatureVectorFactory import *
 import pandas as pd
 
 
 def main():
+
+    raptorfactory = RaptorVectorFactory()
+    raptorfactory._init_()
+
+
+
     # doing some testing
 
     # get true shooting percentage for a player
@@ -46,7 +53,7 @@ def main():
     print(
         f'{player_name} has an effective field goal percentage of {effective_field_goal_percentage} in the {season} season.')
 
-    # this gets game data for the 40th game of the season
+    # this gets game preVectorDATA for the 40th game of the season
     print("\n\n\n----------\nGET GAME DATA FOR THE 40TH GAME OF THE CELTICS 2021-22 SEASON\n")
     # get the score for a specific game
 
@@ -57,7 +64,7 @@ def main():
 
     print(get_single_game_data(games, 40))
 
-    # uncomment to get the data for all the games in for that season
+    # uncomment to get the preVectorDATA for all the games in for that season
 
     # x = 0
     #
