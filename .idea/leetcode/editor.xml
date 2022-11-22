@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="LeetcodeEditor">
+    <option name="projectConfig">
+      <map>
+        <entry key="/var/folders/g4/9r4n3zbx3m5_bt_wy55y34s40000gn/T/leetcode/editor/cn/[1450]在既定时间做作业的学生人数.py">
+          <value>
+            <LeetcodeEditor>
+              <option name="contentPath" value="/var/folders/g4/9r4n3zbx3m5_bt_wy55y34s40000gn/T/leetcode/editor/cn/doc/content/[1450]在既定时间做作业的学生人数.md" />
+              <option name="frontendQuestionId" value="leetcode.cn1450" />
+              <option name="host" value="leetcode.cn" />
+              <option name="path" value="/var/folders/g4/9r4n3zbx3m5_bt_wy55y34s40000gn/T/leetcode/editor/cn/[1450]在既定时间做作业的学生人数.py" />
+              <option name="titleSlug" value="number-of-students-doing-homework-at-a-given-time" />
+            </LeetcodeEditor>
+          </value>
+        </entry>
+        <entry key="/var/folders/g4/9r4n3zbx3m5_bt_wy55y34s40000gn/T/leetcode/editor/en/[753]Cracking the Safe.py">
+          <value>
+            <LeetcodeEditor>
+              <option name="contentPath" value="/var/folders/g4/9r4n3zbx3m5_bt_wy55y34s40000gn/T/leetcode/editor/en/doc/content/[753]Cracking the Safe.md" />
+              <option name="frontendQuestionId" value="leetcode.com753" />
+              <option name="host" value="leetcode.com" />
+              <option name="path" value="/var/folders/g4/9r4n3zbx3m5_bt_wy55y34s40000gn/T/leetcode/editor/en/[753]Cracking the Safe.py" />
+              <option name="titleSlug" value="cracking-the-safe" />
+            </LeetcodeEditor>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

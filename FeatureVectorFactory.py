@@ -26,9 +26,11 @@ class RaptorVectorFactory:
 
     def _init_(self):
         # load the raptor ID data file
-        raptorIDs = self.player_id_dict()
         file = "preVectorDATA/RaptorData (2014-2023) - raptor_data14-23.csv"
-        raptor_id_file = "preVectorDATA/raptor_player_id_dict - raptor_player_id_dict.csv"
+        raptor_id_file = "preVectorDATA/raptor_player_id_dict.csv"
+        #raptorIDs = self.player_id_dict()
+        name_to_id, id_to_name = self.player_id_dict()
+        super_data = self.load_raptor_data()
 
     def load_raptor_data(file):
         """
@@ -38,19 +40,30 @@ class RaptorVectorFactory:
         """
         return pd.read_csv(file)
 
-    name_to_id, id_to_name = player_id_dict()
-    super_data = load_raptor_data("preVectorDATA/raptor_data.csv")
-
     def player_id_dict(self):
         """
-
         :param file: filename
         :returns dict, dict tuple of player_name->player_id and player_id->player_name respectively
         """
-        df = pd.read_csv(raptor_id_file)
+        df = pd.read_csv(self.raptor_id_file)
         x = dict(df.itertuples(False, None))
         y = {v: k for k, v in x.items()}
         return x, y
+
+
+    '''    
+    def get_stat_line(self, season):
+        id = name_to_id[self]
+        lookup = str(id) + "-" + str(season)
+        return super_data.iloc[super_data.index[super_data["player_id_season"] == lookup]].transpose()
+    '''
+
+    def team_vectors(self):
+        """
+
+        """
+        self.name_to_id("Stephen Curry")
+
 
 
 class TeamDataFeatureFactory:
@@ -117,7 +130,7 @@ class TeamDataFeatureFactory:
 
             return teamtensor
 
-            # This code might work if we take out all of the columns with string values
+            # This code might work if we take out all the columns with string values
             # numpyframe = season.to_numpy()
             # tensor = torch.tensor(numpyframe)
             # return tensor
@@ -155,7 +168,7 @@ class RMPFeatureFactory:
 
     def split_by_season(self):
         """
-        This method takes the data from the CSV file and splits it up into matrices that represent each season
+        This† method takes the data from the CSV file and splits it up into matrices that represent each season
         :returns No return, just appends the data to the self.seasons parameter
         """
         if len(self.seasons) != 0:
@@ -190,3 +203,41 @@ class RMPFeatureFactory:
                 print(f"Expected size of returned tensor: (#playersInSeason, ~4)")
 
             return seasontensor
+
+
+class GameDataFeatureFactory:
+    """
+    This class is responsible for creating feature vectors for the individual game data. We will need to first pair
+    up the game IDs
+    """
+
+    def __init__(self, filename="preVectorDATA/GameDATA.csv", debug=True):
+        """Initialize the factory by providing it with the file to read data from"""
+        self.file = filename  # PATH to the CSV file containing team data
+        self.dataframe = pd.read_csv(self.file)  # The overall data frame containing all teams data for all seasons
+        self.seasons = []  # List of data frames split by season
+        self.debug = debug
+
+    def split_by_season(self):
+        """
+        This† method takes the data from the CSV file and splits it up into matrices that represent each season
+        :returns No return, just appends the data to the self.seasons parameter
+        """
+        if len(self.seasons) != 0:
+            print("Seasons list already has data in it! GameData split_by_season() exiting...")
+        else:
+            seasonids = (22013, 22014, 22015, 22016, 22017, 22018, 22019, 22020, 22021, 22022)
+            for x in seasonids:
+                mask = self.dataframe['SEASON_ID'] == x  # Split the data frame to only have the current season rows
+                self.seasons.append(self.dataframe[mask])  # Append the current season to the list of split seasons
+
+    def create_game_tuples(self):
+        """
+        This method will create a list of tuples. The pair will be matching the game ids for the home and away teams
+        :return: A list of tuples containing the game ids for the home and away teams
+        """
+        game_tuples = []
+        for season in self.seasons:
+            for index, row in season.iterrows():
+                game_tuples.append((row['GAME_ID'], row['GAME_ID']))
+        return game_tuples

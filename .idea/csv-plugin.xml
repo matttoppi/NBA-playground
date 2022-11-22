@@ -3,28 +3,70 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="/games.csv">
+        <entry key="/TEAM_ROSTERS.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>
-        <entry key="/player_id_dict.csv">
+        <entry key="/preVectorDATA/GameDATA(2014-2023) - games.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>
-        <entry key="/preVectorDATA/RaptorData (2014-2023) - raptor_data14-23.csv">
+        <entry key="/preVectorDATA/Player_Team Lookups.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>
-        <entry key="/raptor_data.csv">
+        <entry key="/preVectorDATA/Player_Team_Lookups.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/preVectorDATA/RPM_Player_Season(2014-2023) - Sheet1.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/preVectorDATA/RPM_Player_Seasons.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/preVectorDATA/RaptorData (2014-2023)-2.xlsx - Sheet1.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/preVectorDATA/TeamData(2014-2023) - COMBINED.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/preVectorDATA/TeamData.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/preVectorDATA/raptor_player_id_dict - raptor_player_id_dict.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
