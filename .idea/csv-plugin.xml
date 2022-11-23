@@ -10,14 +10,7 @@
             </Attribute>
           </value>
         </entry>
-        <entry key="/preVectorDATA/GameDATA(2014-2023) - games.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/preVectorDATA/Player_Team Lookups.csv">
+        <entry key="/preVectorDATA/GameDATA.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -31,7 +24,7 @@
             </Attribute>
           </value>
         </entry>
-        <entry key="/preVectorDATA/RPM_Player_Season(2014-2023) - Sheet1.csv">
+        <entry key="/preVectorDATA/RPM_Player_Season.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -45,14 +38,7 @@
             </Attribute>
           </value>
         </entry>
-        <entry key="/preVectorDATA/RaptorData (2014-2023)-2.xlsx - Sheet1.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/preVectorDATA/TeamData(2014-2023) - COMBINED.csv">
+        <entry key="/preVectorDATA/RaptorData.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -66,7 +52,7 @@
             </Attribute>
           </value>
         </entry>
-        <entry key="/preVectorDATA/raptor_player_id_dict - raptor_player_id_dict.csv">
+        <entry key="/preVectorDATA/raptor_player_id_dict.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

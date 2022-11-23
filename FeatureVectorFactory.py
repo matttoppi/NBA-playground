@@ -13,7 +13,6 @@ import datetime
 import random
 import torch
 
-
 # this is a class that takes in data from the preVectorDATA folder and creates a feature vector data file to put into
 # the featureVECTOR data folder
 
@@ -50,16 +49,9 @@ class RaptorVectorFactory:
         y = {v: k for k, v in x.items()}
         return x, y
 
-
-    '''    
-    def get_stat_line(self, season):
-        id = name_to_id[self]
-        lookup = str(id) + "-" + str(season)
-        return super_data.iloc[super_data.index[super_data["player_id_season"] == lookup]].transpose()
-    '''
-
     def team_vectors(self):
         """
+        This method is used to create the team vectors for the raptor data
 
         """
         self.name_to_id("Stephen Curry")

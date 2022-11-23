@@ -12,7 +12,8 @@ import pandas as pd
 
 
 def main():
-    df = pd.read_csv('preVectorDATA/Player_Team_Lookups.csv') # player team lookups
+
+    # df = pd.read_csv('preVectorDATA/Player_Team_Lookups.csv') # player team lookups
     '''
     #copy = pd.DataFrame()
     df = df[['NAME', 'ABBREV', 'SEASON','PLAYER_ID']] #restricting to necessary columns
