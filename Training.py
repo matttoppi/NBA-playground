@@ -1,6 +1,21 @@
 import random
 
 from evalMetric import *
+import numpy as np
+import pandas as pd
+import xgboost as xgb
+
+
+
+def evaluate(predictions, actual):
+    """
+    This method evaluates the model by calculating the average error
+    :param predictions: The predictions made by the model
+    :param actual: The actual scores
+    :return:
+    """
+    # Calculate the average error
+    return np.average(np.abs(predictions - actual))
 
 
 def tobey_train(train, test):
@@ -55,7 +70,7 @@ def matt_train(train, test):
         for actual in season[21]: # for each game in the test set
             # for each game in the test set
             # Predicts a random score for each team
-            predicted = random.randint(95, 110)  # random score between 75 and 125
+            predicted = random.randint(95, 110)  # random score between 95 and 110
 
             # get the score from that game
             # turn the tensor into an int
@@ -82,7 +97,7 @@ def lucas_train(train, test):
     :param test: The game data that we are predicting against
     :return:
     """
-    testDiff = 0  # Total difference 
+    testDiff = 0  # Total difference
     for season in test:
         for gameScore in season[21]:
             prediction = lucas_model()

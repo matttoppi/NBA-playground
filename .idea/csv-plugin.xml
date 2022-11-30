@@ -3,7 +3,7 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="/TEAM_ROSTERS.csv">
+        <entry key="/features.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -11,6 +11,13 @@
           </value>
         </entry>
         <entry key="/preVectorDATA/GameDATA.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/preVectorDATA/GameData.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
