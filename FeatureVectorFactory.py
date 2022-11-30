@@ -65,13 +65,12 @@ class RaptorVectorFactory:
         # super_data.to_csv("./super_data.csv")
         for (team_season, roster) in rosters.items():  # iterate through team-season columns
             season = team_season[-2:]
-            temp = np.zeros(shape=(13, 1), dtype=float)  # create blank DF for each team-season
+            feature_vectors[team_season] = pd.Series(np.zeros(shape=(13), dtype=float))  #blank col for each team-season
             print(team_season)
             count = 0
 
             for player in roster:  # iterate through rosters for each team-season column
-                if str(player) != "nan" and not str(player).isdigit() and int(
-                        season) < 23:  # make sure player name is valid
+                if str(player) != "nan" and not str(player).isdigit() and int(season) < 23:  #verify player name is valid
                     print(player)  # Individual player from the roster
 
                     try:
@@ -79,10 +78,11 @@ class RaptorVectorFactory:
                         lookup = str(id) + "-" + str(season)
                         p_d = super_data[lookup].to_numpy()
                         print("minutes:", p_d[1])
-                        temp = temp + (p_d[1] * p_d)
+                        feature_vectors[team_season] = feature_vectors[team_season] + (p_d[1] * p_d)
                         count += 1
                     except:
-                        print("player not found")
+                        feature_vectors[team_season] = feature_vectors[team_season] + pd.Series(np.zeros(shape=13,
+                                                                                                         dtype=float))
                         continue
 
                     # add player's raptor data to temp DF
@@ -93,11 +93,12 @@ class RaptorVectorFactory:
                     if count > 0:
                         print("count: " + str(count))
 
-            print(temp[0].transpose())
-            if len(team_season)==6:
-                # feature_vectors[team_season].append(temp[0].transpose())
-                feature_vectors[team_season] = temp[0].transpose()
+            #print(temp[0])
 
+            #feature_vectors[team_season].append(temp[0].transpose())
+            feature_vectors[team_season] = feature_vectors[team_season] / count
+
+        del feature_vectors["Unnamed: 0"]
         feature_vectors.to_csv("./features.csv")
 
         #         print("\n" + player)
