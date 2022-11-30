@@ -77,7 +77,7 @@ class RaptorVectorFactory:
                         id = name_to_id[player]
                         lookup = str(id) + "-" + str(season)
                         p_d = super_data[lookup].to_numpy()
-                        print("minutes:", p_d[1])
+                        print("minutes:", p_d[0])
                         feature_vectors[team_season] = feature_vectors[team_season] + (p_d[1] * p_d)
                         count += 1
                     except:
