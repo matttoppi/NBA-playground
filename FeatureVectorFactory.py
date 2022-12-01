@@ -58,18 +58,18 @@ class RaptorVectorFactory:
         This method is used to create the team vectors for the raptor data
 
         """
-        super_data = pd.read_csv("preVectorDATA/total_data.csv")
-        rosters = pd.read_csv('preVectorDATA/TEAM_ROSTERS.csv')
-        feature_vectors = pd.DataFrame()
-        unweighted_features = pd.DataFrame()
+        super_data = pd.read_csv("preVectorDATA/total_data.csv") # feature data for each player
+        rosters = pd.read_csv('preVectorDATA/TEAM_ROSTERS.csv') #bseason-by-season rosters
+        feature_vectors = pd.DataFrame() # column for each team-season
+        unweighted_features = pd.DataFrame() # same as feature_vectors but unweighted
         name_to_id, id_to_name = self.player_id_dict()
 
 
         for (team_season, roster) in rosters.items():  # iterate through team-season columns
-            season = team_season[-2:]
+            season = team_season[-2:] #ie "ATL-15" -> "15"
             feature_vectors[team_season] = pd.Series(np.zeros(shape=(17), dtype=float))  #blank col for each team-season
             unweighted_features[team_season] = pd.Series(np.zeros(shape=(17), dtype=float))  #blank col for each team-season
-            print(team_season)
+            #print(team_season)
             player_count = 0 # no. of players on each roster
             player_weight = 0 # weight of each player for feature creation
             for player in roster:  # iterate through rosters for each team-season column
@@ -77,67 +77,40 @@ class RaptorVectorFactory:
                     print(player)  # Individual player from the roster
 
                     try:
-                        id = name_to_id[player]
-                        lookup = str(id) + "-" + str(season)
-                        player_data = super_data[lookup].to_numpy()
-                        rpm_data = player_data
+                        id = name_to_id[player] #gets player's raptor id
+                        lookup = str(id) + "-" + str(season) #creates lookup string from player id and current season
+                        player_data = super_data[lookup].to_numpy() #numpy vector of the player specific data
+                        rpm_data = player_data # copy of player data to be left unweighted
                         print("possessions:", player_data[1])
 
                         player_weight = player_data[1] #setting player weight to possessions
-                        feature_vectors[team_season] = feature_vectors[team_season] + (player_weight*player_data)
+                        feature_vectors[team_season] = feature_vectors[team_season] + (player_weight*player_data) #store weighted accumulative sun
                         unweighted_features[team_season] = unweighted_features[team_season] + rpm_data #store unweighted data
 
 
-                        player_count += 1
+                        player_count += 1 #count players on roster
                     except:
                         feature_vectors[team_season] = feature_vectors[team_season] + pd.Series(np.zeros(shape=17,
                                                                                                          dtype=float))
+                        #do not update team stats for player not found error
                         continue
 
 
-                    if player_count > 0:
-                        print("count: " + str(player_count))
+
 
             #feature_vectors[team_season][0] = unweighted_features[team_season][0]
             #feature_vectors[team_season][1] = unweighted_features[team_season][1]
 
-            feature_vectors[team_season] = feature_vectors[team_season] / player_count
+            feature_vectors[team_season] = feature_vectors[team_season] / player_count #averages stats
             feature_vectors[team_season][16] = unweighted_features[team_season][16]
             feature_vectors[team_season][15] = unweighted_features[team_season][15]
             feature_vectors[team_season][14] = unweighted_features[team_season][14]
             feature_vectors[team_season][13] = unweighted_features[team_season][13]  # reverts RPM features to unweighted avg
 
 
-        del feature_vectors["Unnamed: 0"]
-        feature_vectors.to_csv("./features.csv")
+        del feature_vectors["Unnamed: 0"] #delete unnecessary column
+        feature_vectors.to_csv("./features.csv") #write design matrix to csv
         print("success")
-
-        #         print("\n" + player)
-        #         try:
-        #             id = name_to_id[player]
-        #             lookup = str(id) + "-" + str(season)
-        #
-        #             #add the player's data to the temp dataframe
-        #             temp = temp.append(super_data.loc[super_data['player_id_season'] == lookup])
-        #             count += 1
-        #
-        #             #super_data.iloc[super_data.index[super_data["player_id_season"] == lookup]].transpose()
-        #         except:
-        #             # print("player not found")
-        #             continue
-        # if count>0:
-        #     print("count: ", count)
-        #     # temp[team_season] = (temp[team_season] / count)
-        # print(temp)
-        # # feature_vectors[team_season] = temp.iloc[:, :].sum(axis=1)
-
-        # math goes here to combine all players vectors. Scale the vectors based on the minutes player (MP) played
-        # by each player
-
-        # get the minutes played for each player
-
-        # temp2 =
-        # feature_vectors[team_season] = temp2 # here add the weighted team vector to output
 
 
 class TeamDataFeatureFactory:
