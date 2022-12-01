@@ -58,17 +58,20 @@ class RaptorVectorFactory:
         This method is used to create the team vectors for the raptor data
 
         """
-        super_data = pd.read_csv("preVectorDATA/RaptorData.csv")
+        super_data = pd.read_csv("preVectorDATA/total_data.csv")
         rosters = pd.read_csv('preVectorDATA/TEAM_ROSTERS.csv')
         feature_vectors = pd.DataFrame()
+        unweighted_features = pd.DataFrame()
         name_to_id, id_to_name = self.player_id_dict()
-        # super_data.to_csv("./super_data.csv")
+
+
         for (team_season, roster) in rosters.items():  # iterate through team-season columns
             season = team_season[-2:]
-            feature_vectors[team_season] = pd.Series(np.zeros(shape=(13), dtype=float))  #blank col for each team-season
+            feature_vectors[team_season] = pd.Series(np.zeros(shape=(17), dtype=float))  #blank col for each team-season
+            unweighted_features[team_season] = pd.Series(np.zeros(shape=(17), dtype=float))  #blank col for each team-season
             print(team_season)
-            count = 0
-
+            player_count = 0 # no. of players on each roster
+            player_weight = 0 # weight of each player for feature creation
             for player in roster:  # iterate through rosters for each team-season column
                 if str(player) != "nan" and not str(player).isdigit() and int(season) < 23:  #verify player name is valid
                     print(player)  # Individual player from the roster
@@ -76,30 +79,38 @@ class RaptorVectorFactory:
                     try:
                         id = name_to_id[player]
                         lookup = str(id) + "-" + str(season)
-                        p_d = super_data[lookup].to_numpy()
-                        print("minutes:", p_d[0])
-                        feature_vectors[team_season] = feature_vectors[team_season] + (p_d[1] * p_d)
-                        count += 1
+                        player_data = super_data[lookup].to_numpy()
+                        rpm_data = player_data
+                        print("possessions:", player_data[1])
+
+                        player_weight = player_data[1] #setting player weight to possessions
+                        feature_vectors[team_season] = feature_vectors[team_season] + (player_weight*player_data)
+                        unweighted_features[team_season] = unweighted_features[team_season] + rpm_data #store unweighted data
+
+
+                        player_count += 1
                     except:
-                        feature_vectors[team_season] = feature_vectors[team_season] + pd.Series(np.zeros(shape=13,
+                        feature_vectors[team_season] = feature_vectors[team_season] + pd.Series(np.zeros(shape=17,
                                                                                                          dtype=float))
                         continue
 
-                    # add player's raptor data to temp DF
 
-                    # print(temp)
-                    # temp = pd.concat([temp, temp], axis=0)
+                    if player_count > 0:
+                        print("count: " + str(player_count))
 
-                    if count > 0:
-                        print("count: " + str(count))
+            #feature_vectors[team_season][0] = unweighted_features[team_season][0]
+            #feature_vectors[team_season][1] = unweighted_features[team_season][1]
 
-            #print(temp[0])
+            feature_vectors[team_season] = feature_vectors[team_season] / player_count
+            feature_vectors[team_season][16] = unweighted_features[team_season][16]
+            feature_vectors[team_season][15] = unweighted_features[team_season][15]
+            feature_vectors[team_season][14] = unweighted_features[team_season][14]
+            feature_vectors[team_season][13] = unweighted_features[team_season][13]  # reverts RPM features to unweighted avg
 
-            #feature_vectors[team_season].append(temp[0].transpose())
-            feature_vectors[team_season] = feature_vectors[team_season] / count
 
         del feature_vectors["Unnamed: 0"]
         feature_vectors.to_csv("./features.csv")
+        print("success")
 
         #         print("\n" + player)
         #         try:
