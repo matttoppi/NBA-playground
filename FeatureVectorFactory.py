@@ -373,7 +373,7 @@ def get_final_tensors(game_tensors, weighted_tensors):
     """
     takes the data from the gametensors dataframe
     :param game_tensors:  torch.tensor
-    :param wegihted_tesnors:  torch.tensor
+    :param weighted_tensors:  torch.tensor
     :return:
     """
 
