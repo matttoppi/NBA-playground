@@ -7,11 +7,11 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Conv1D, MaxPooling1D, Flatten
+#from keras.models import Sequential
+#from keras.layers import Dense, Activation, Conv1D, MaxPooling1D, Flatten
 
 
-from sklearn.preprocessing import MinMaxScaler
+#from sklearn.preprocessing import MinMaxScaler
 
 
 
