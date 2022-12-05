@@ -260,8 +260,6 @@ class GameDataFeatureFactory:
     """
     This class is responsible for creating feature vectors for the individual game data. We will need to first pair
     up the game IDs
-
-
     """
 
     def __init__(self, filename="preVectorDATA/GameDATA.csv", debug=True):
