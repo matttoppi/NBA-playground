@@ -3,7 +3,7 @@ import random
 from evalMetric import *
 import numpy as np
 import pandas as pd
-import xgboost as xgb
+#import xgboost as xgb
 
 
 
@@ -98,7 +98,7 @@ def lucas_train(train, test):
     :return:
     """
     testDiff = 0  # Total difference
-    for season in test:
+    for season in test:  # Loops through each season, so could print out error for each season individually
         for gameScore in season[21]:
             prediction = lucas_model()
 

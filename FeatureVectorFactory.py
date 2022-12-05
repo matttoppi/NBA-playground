@@ -11,7 +11,7 @@ import time
 import datetime
 import random
 import torch
-from sklearn.model_selection import train_test_split
+#from sklearn.model_selection import train_test_split
 
 
 # this is a class that takes in data from the preVectorDATA folder and creates a feature vector data file to put into
