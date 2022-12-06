@@ -1,9 +1,9 @@
 # https://github.com/swar/nba_api
 # https://github.com/swar/nba_api/tree/master/docs/examples
 
-from nba_api.stats.static import teams
-from nba_api.stats.endpoints import leaguegamefinder
-from nba_api.stats.static import teams
+#from nba_api.stats.static import teams
+#from nba_api.stats.endpoints import leaguegamefinder
+#from nba_api.stats.static import teams
 
 #from call_library import *
 from FeatureVectorFactory import *
