@@ -49,33 +49,39 @@ def trainMLP(model):
     print(test_targets.size())
 
     # Define the optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.006)
     # Iterate over the training data in batches
 
-    # input1 is the input data. each input1 is a tensor of size 57 representing a game
-    # train_data[0] the entire data set including the target (21848x57)
-    # train_data[1] the target data (21848x1)
-
     loss_fn = torch.nn.MSELoss()
-    i = 0 #iteration counter
-    for input1 in train_data[0]:
-        i+=1
-        # Make predictions using the MLP model
-        output = model(train_data[0])
+    lowest_loss = 1000000
+    lowest_test_loss = 1000000
+    on_epoch = 0
+    num_epochs = 1000
+    batch_size = 100
+    batch_count = 0
+    for epoch in range(num_epochs):
+        output = model(train_data)
         # Compute the loss between the predictions and the target values
-
-        loss = loss_fn(output, train_data[1][i])
-        print(i, " loss: ", loss.item())
+        loss = loss_fn(output, train_targets)
         # Zero the gradients
         optimizer.zero_grad()
-
         # Backpropagate the error
         loss.backward()
-
         # Update the model parameters
         optimizer.step()
-        if(i>1000):
-            break
+        if loss.item() < lowest_loss:
+            lowest_loss = loss.item()
+            on_epoch = epoch
+            print("new low: ", lowest_loss, " on epoch ", epoch)
+            torch.save(model.state_dict(), "models/MLP.pt")
+
+        test_loss = loss_fn(model(train_data),train_targets)
+        print("epoch: ", epoch, " test loss: ", test_loss.item(), "lowest test loss: ", lowest_test_loss)
+        if test_loss.item() < lowest_test_loss:
+            lowest_test_loss = test_loss.item()
+            on_epoch = epoch
+            torch.save(model.state_dict(), "models/MLP2.pt")
+            print("epoch: ", epoch, " loss: ", loss.item(), "lowest loss: ", lowest_loss, " on epoch: ", on_epoch)
 
 
 def data_load():
@@ -85,9 +91,15 @@ def data_load():
         data = np.array([[col for j, col in enumerate(row) if j > 0] for i, row in enumerate(reader) if i > 0],
                         dtype=np.float32)
 
-    k = 0.8 * len(data)
+    # Split the data into training and testing sets
+    train_data, train_targets = data[:16880, :], data[:16880, 23]
+    test_data, test_targets = data[16878:21500, :], data[16878:21500, 23]
+    train_data = np.delete(train_data,23,1)
+    test_data = np.delete(test_data,23,1)
+    # Convert the data into PyTorch tensors
+    train_data, train_targets = torch.from_numpy(train_data), torch.from_numpy(train_targets)
+    test_data, test_targets = torch.from_numpy(test_data), torch.from_numpy(test_targets)
+
+    return train_data, train_targets, test_data, test_targets
 
 
-
-    # Split by train and test, convert the NumPy array into PyTorch tensors and return
-    return torch.from_numpy(data[:k, :]), torch.from_numpy(data[:k, 23]), torch.from_numpy(data[k:, :]), torch.from_numpy(data[k:, 23]
