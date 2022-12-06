@@ -109,7 +109,7 @@ class RaptorVectorFactory:
 
 
         del feature_vectors["Unnamed: 0"] #delete unnecessary column
-        feature_vectors.to_csv("./features.csv") #write design matrix to csv
+        feature_vectors.to_csv("vectorDATA/features.csv") #write design matrix to csv
         print("success")
 
 
