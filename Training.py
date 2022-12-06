@@ -76,7 +76,7 @@ def matt_train(train, test):
     total_diff = 0
 
     for season in test: # for each season in the test set
-        for actual in season[21]: # for each game in the test set
+        for actual in season[22]: # for each game in the test set
             # for each game in the test set
             # Predicts a random score for each team
             predicted = random.randint(95, 110)  # random score between 95 and 110

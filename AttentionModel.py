@@ -32,7 +32,7 @@ class BasicProjectionLayer(nn.Module):
         batched by season, so the in_feats input would only be data from one season, so shape (1, 30, 23) or (30, 23)
         :return: A latent-space vector matrix of the game data
         """
-        print(f'In: {self.in_features_from_gamedata}; Out: {self.out_features_from_gamedata}')
+        #print(f'In: {self.in_features_from_gamedata}; Out: {self.out_features_from_gamedata}')
         return self.raw_gamedata_projection_layer(in_feats)
 
 
@@ -69,26 +69,26 @@ class BasicAttentionLayer(nn.Module):
 
         # Transpose key
         key_transpose = torch.transpose(key, -2, -1)
-        print(f'query size: {query.size()}')
-        torch.set_printoptions(profile="full")
-        print(query[0])
-        torch.set_printoptions(profile="default")
+        #print(f'query size: {query.size()}')
+        #torch.set_printoptions(profile="full")
+        #print(query[0])
+        #torch.set_printoptions(profile="default")
         # Calculate the query dot key score
         scores = torch.matmul(query, key_transpose)
-        print("Before softmax")
-        print(scores.size())
-        print(scores)
+        #print("Before softmax")
+        #print(scores.size())
+        #print(scores)
 
         scores = scores / scale_value
-        print("After scaling")
-        print(scores)
+        #print("After scaling")
+        #print(scores)
 
         # Send the score through a softmax
         softmaxed_score = self.softmax(scores)
-        print("After softmax")
-        torch.set_printoptions(profile="full")
-        print(softmaxed_score[0])
-        torch.set_printoptions(profile="default")
+        #print("After softmax")
+        #torch.set_printoptions(profile="full")
+        #print(softmaxed_score[0])
+        #torch.set_printoptions(profile="default")
 
         # Return the attention matrix along with the softmax scores for the matrix
         return torch.matmul(softmaxed_score, value), softmaxed_score
@@ -108,11 +108,14 @@ class BasicPredictionLayer(nn.Module):
 
     def __init__(self):
         super(BasicPredictionLayer, self).__init__()
-        self.reverseProjection = nn.Linear(16, 2)
+        self.reverseProjection = nn.Linear(128, 24)
         self.activationLayer = nn.Softmax()
+        self.predictRow = nn.Linear(24, 1)
 
     def forward(self, attention_data):
-        return self.activationLayer(self.reverseProjection(attention_data))
+        revProj = self.reverseProjection(attention_data)
+        denorm = nn.functional.normalize(revProj, 1/2, dim=0)
+        return self.predictRow(self.activationLayer(denorm))
 
 
 class LucasModel(nn.Module):
@@ -138,13 +141,56 @@ class LucasModel(nn.Module):
 
     def forward(self, input_data):
         projections = self.projection(input_data)  # Projecting the data into a latent space
-        print(f'Projections size: {projections.size()}')
+        #print(f'Projections size: {projections.size()}')
 
         attentionScores, softmaxVals = self.attention(projections, projections, projections)
 
         predictions = self.prediction(attentionScores)
 
         return predictions
+
+
+class TrainLoop:
+    """
+
+    """
+
+    def __init__(self, MyModel, train_data, target_data):
+        self.epochs = 0
+        self.total_loss = 0
+        self.model = MyModel
+        self.train_data = train_data
+        self.target_data = target_data
+        self.loss_function = nn.MSELoss()
+        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.001)
+
+
+    def trainOnce(self):
+        """
+
+        """
+
+        self.optimizer.zero_grad()
+        ouput = self.model.forward(self.train_data)
+
+        loss = self.loss_function(ouput, self.target_data)
+
+        print(loss.item())
+
+        loss.backward()
+
+        self.optimizer.step()
+
+        self.total_loss += loss.item()
+
+    def testPrediction(self, fakeInput, actualValues):
+        output = self.model.forward(fakeInput)
+
+        print(f"Predicted: {output}")
+        print(f"Actual: {actualValues}")
+        print(f"Error: {output - actualValues}")
+
+
 
 
 """

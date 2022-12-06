@@ -35,14 +35,14 @@ def lucas():
     traintrans = nn.functional.normalize(traintrans, 2, dim=0)
     target_values = train[0][22]
 
-    inFeats = len(traintrans[0])
-    outFeats = 128
+    #inFeats = len(traintrans[0])
+    #outFeats = 128
 
     # print(f'inFeats: {inFeats}')
     # print(f'traintrans: {traintrans}')
     # print(train[0][0])
 
-    lucas_model = LucasModel(inFeats, outFeats)
+    #lucas_model = LucasModel(inFeats, outFeats)
 
     # prediction = lucas_model.forward(traintrans)
 
