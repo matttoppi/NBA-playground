@@ -89,7 +89,7 @@ def lucas():
 
 def matt():
     # getDataMatt()
-    load_features()
+    feedForward()
     print("Matt")
 
 

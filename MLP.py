@@ -48,6 +48,22 @@ def trainMLP(model):
     optimizer = torch.optim.Adam(m_l_p.parameters(), lr=0.01)
 
 
+    # input1 is the input data. each input1 is a tensor of size 57 representing a game
+    # train_data[0] the entire data set including the target (21848x57)
+    # train_data[1] the target data (21848x1)
+
+    loss_fn = torch.nn.MSELoss()
+    i = 0 #iteration counter
+    for input1 in train_data[0]:
+        i+=1
+        # Make predictions using the MLP model
+        output = model(train_data[0])
+        # Compute the loss between the predictions and the target values
+
+        loss = loss_fn(output, train_data[1][i])
+        print(i, " loss: ", loss.item())
+        # Zero the gradients
+        optimizer.zero_grad()
 
 
 
