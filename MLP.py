@@ -41,10 +41,12 @@ def trainMLP(model):
     """
 
 
-    # Define the loss function
-    train_data = data_load()
-    print(train_data[0].size())
-    print(train_data[1].size())
+
+    train_data, train_targets, test_data, test_targets = data_load()
+    print(train_data.size())
+    print(test_data.size())
+    print(train_targets.size())
+    print(test_targets.size())
 
     # Define the optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
@@ -83,6 +85,9 @@ def data_load():
         data = np.array([[col for j, col in enumerate(row) if j > 0] for i, row in enumerate(reader) if i > 0],
                         dtype=np.float32)
 
+    k = 0.8 * len(data)
 
-    # Convert the NumPy array into PyTorch tensors
-    return torch.from_numpy(data), torch.from_numpy(data[:, 23])
+
+
+    # Split by train and test, convert the NumPy array into PyTorch tensors and return
+    return torch.from_numpy(data[:k, :]), torch.from_numpy(data[:k, 23]), torch.from_numpy(data[k:, :]), torch.from_numpy(data[k:, 23]
