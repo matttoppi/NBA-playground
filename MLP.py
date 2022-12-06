@@ -24,29 +24,31 @@ class MLP(nn.Module):
         :return:
         """
         hidden = self.input_layer(input)
+        #print("hidden1: ", hidden.size())
         hidden = self.hidden_layer(hidden)
+        #print("hidden2: ", hidden.size())
         output = self.output_layer(hidden)
+        #print("output: ", output.size())
         return output
 
 
 def trainMLP(model):
     """
-    :param model:
-    :return:
-    ""
     Training MLP model.
 
-    :param model:
+    :param model: instance of MLP class
     :return:
     """
-    m_l_p = MLP(input_size=10, hidden_size=32, output_size=1)
+
 
     # Define the loss function
     train_data = data_load()
+    print(train_data[0].size())
+    print(train_data[1].size())
 
     # Define the optimizer
-    optimizer = torch.optim.Adam(m_l_p.parameters(), lr=0.01)
-
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+    # Iterate over the training data in batches
 
     # input1 is the input data. each input1 is a tensor of size 57 representing a game
     # train_data[0] the entire data set including the target (21848x57)
@@ -65,17 +67,22 @@ def trainMLP(model):
         # Zero the gradients
         optimizer.zero_grad()
 
+        # Backpropagate the error
+        loss.backward()
+
+        # Update the model parameters
+        optimizer.step()
+        if(i>1000):
+            break
 
 
 def data_load():
     # Read the CSV file into a NumPy array
     with open('preVectorDATA/ALL_GAME_DATA.csv', 'r') as f:
         reader = csv.reader(f)
-        data = np.array([row for row in reader], dtype=np.float32)
-
-    # Convert the NumPy array into a PyTorch tensor
-    return torch.from_numpy(data)
+        data = np.array([[col for j, col in enumerate(row) if j > 0] for i, row in enumerate(reader) if i > 0],
+                        dtype=np.float32)
 
 
-# Create an MLP with 22 input nodes, 64 hidden nodes, and 1 output node
-mlp = MLP(input_size=22, hidden_size=64, output_size=1)
+    # Convert the NumPy array into PyTorch tensors
+    return torch.from_numpy(data), torch.from_numpy(data[:, 23])

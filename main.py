@@ -15,6 +15,7 @@ from Training import *
 from AttentionModel import *
 from SingleGameAttention import *
 from matts_training import *
+from MLP import *
 
 
 
@@ -95,7 +96,10 @@ def matt():
 
 
 def tobey():
-    print("Tobey")
+    mlp = MLP(input_size=57, hidden_size=32, output_size=1)
+    trainMLP(mlp)
+    print("Tobey - code started")
+
 
 
 
