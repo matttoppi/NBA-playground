@@ -32,7 +32,7 @@ class BasicProjectionLayer(nn.Module):
         batched by season, so the in_feats input would only be data from one season, so shape (1, 30, 23) or (30, 23)
         :return: A latent-space vector matrix of the game data
         """
-        #print(f'In: {self.in_features_from_gamedata}; Out: {self.out_features_from_gamedata}')
+        #print(f"Size of in features to project: {in_feats.size()}")
         return self.raw_gamedata_projection_layer(in_feats)
 
 
@@ -153,48 +153,3 @@ class LucasNewModel(nn.Module):
         predictions = self.prediction(attentionScores)
 
         return predictions
-
-
-class TrainLoopNew:
-    """
-
-    """
-
-    def __init__(self, MyModel, train_data, target_data):
-        self.epochs = 0
-        self.total_loss = 0
-        self.model = MyModel
-        self.train_data = train_data
-        self.target_data = target_data
-        self.loss_function = nn.MSELoss()
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.001)
-
-    def newData(self, newTrain, newTarget):
-        self.train_data = newTrain
-        self.target_data = newTarget
-
-
-    def trainOnce(self):
-        """
-
-        """
-
-        self.optimizer.zero_grad()
-        ouput = self.model.forward(self.train_data)
-
-        loss = self.loss_function(ouput, self.target_data)
-
-        #print(loss.item())
-
-        loss.backward()
-
-        self.optimizer.step()
-
-        self.total_loss += loss.item()
-
-    def testPrediction(self, fakeInput, actualValues):
-        output = self.model.forward(fakeInput)
-
-        print(f"Predicted: {output.item()}")
-        print(f"Actual: {actualValues.item()}")
-        print(f"Error: {output - actualValues}")
