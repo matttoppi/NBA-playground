@@ -68,30 +68,35 @@ class BasicAttentionLayer(nn.Module):
         scale_value = math.sqrt(self.layer_dims)
 
         # Transpose key
-        key_transpose = torch.transpose(key, -2, -1)
+        key_transpose = torch.transpose(key, 0, -1)
+
         #print(f'query size: {query.size()}')
         #torch.set_printoptions(profile="full")
         #print(query[0])
         #torch.set_printoptions(profile="default")
+
         # Calculate the query dot key score
-        scores = torch.matmul(query, key_transpose)
+        scores = torch.mul(query, key_transpose)
+
         #print("Before softmax")
         #print(scores.size())
         #print(scores)
 
         scores = scores / scale_value
+
         #print("After scaling")
         #print(scores)
 
         # Send the score through a softmax
         softmaxed_score = self.softmax(scores)
+
         #print("After softmax")
         #torch.set_printoptions(profile="full")
         #print(softmaxed_score[0])
         #torch.set_printoptions(profile="default")
 
         # Return the attention matrix along with the softmax scores for the matrix
-        return torch.matmul(softmaxed_score, value), softmaxed_score
+        return torch.mul(softmaxed_score, value), softmaxed_score
 
     def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor):
         """
@@ -179,7 +184,7 @@ class TrainLoopNew:
 
         loss = self.loss_function(ouput, self.target_data)
 
-        print(loss.item())
+        #print(loss.item())
 
         loss.backward()
 
@@ -190,6 +195,6 @@ class TrainLoopNew:
     def testPrediction(self, fakeInput, actualValues):
         output = self.model.forward(fakeInput)
 
-        print(f"Predicted: {output}")
-        print(f"Actual: {actualValues}")
+        print(f"Predicted: {output.item()}")
+        print(f"Actual: {actualValues.item()}")
         print(f"Error: {output - actualValues}")

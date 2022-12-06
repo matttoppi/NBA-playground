@@ -31,6 +31,7 @@ def lucas():
         #print(len(season[0]))
 
     # Lucas Test Code ===================================================================
+
     traintrans = torch.transpose(train[0], 0, 1)
     traintrans = nn.functional.normalize(traintrans, 2, dim=0)
     target_values = train[0][22]
@@ -57,19 +58,31 @@ def lucas():
     newInFeats = 24
     newOutFeats = 128
     lucas_new_model = LucasNewModel(newInFeats, newOutFeats)
+    for season in train:
+        season = torch.transpose(season, 0, 1)
+        season = nn.functional.normalize(season, 2, dim=0)
+    allTraintrans = train
+    target_values = train[0][22]
 
-    newTrainData = train[0]
-    print(f'Len of new Data {len(newTrainData)}')
+    #TODO: Get all seasons working in one training loop (ie get transpose to work over all seasons)
+
+    newTrainData = traintrans
+    print(f'Len of new Data {newTrainData.size()}')
 
     newTrainLoop = TrainLoopNew(lucas_new_model, newTrainData, target_values)
 
-    for i in range(len(newTrainData)):
-        trainRow = newTrainData[i]
-        targetRow = target_values[i]
-        newTrainLoop.newData(trainRow, targetRow)
-        newTrainLoop.trainOnce()
+    for x in range(len(allTraintrans)):
+        target_values = train[x][22]
+        newTrainData = allTraintrans[x]
 
-    newTrainLoop.testPrediction(newTrainData[0], target_values[0])
+        for i in range(len(newTrainData)):
+            trainRow = newTrainData[i]
+            targetRow = target_values[i]
+            newTrainLoop.newData(trainRow, targetRow)
+            newTrainLoop.trainOnce()
+
+    for i in range(10):
+        newTrainLoop.testPrediction(newTrainData[i], target_values[i])
 
     # End New Attention ---------------------------------------------
 
@@ -103,8 +116,8 @@ def tobey():
 
 def main():
     print("code started")
-    matt()
-    # lucas()
+    #matt()
+    lucas()
     # tobey()
 
 
