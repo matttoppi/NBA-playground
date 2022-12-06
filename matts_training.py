@@ -131,6 +131,9 @@ def load_features():
         # specify the target column
         target_column = "PTS"
 
+        # convert the target column name to an integer
+        target_column = int(target_column)
+
         # write the column names to the output file
         writer.writerow(column_names)
 
