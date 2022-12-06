@@ -112,8 +112,8 @@ def matts_LSTM_train(train, test):
 
     learning_rate = 0.01
     epochs = 100
-    batch_size = 100
-    num_units = 100
+    batch_size = 10
+    num_units = 100 # number of units in the LSTM layer
 
     X = torch.FloatTensor(train[0][0]) # input
     y = torch.FloatTensor(train[0][21]) # 21 is the index of the score column

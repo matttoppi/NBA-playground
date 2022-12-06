@@ -13,32 +13,13 @@ import numpy as np
 import torch
 from Training import *
 from AttentionModel import *
+from SingleGameAttention import *
+from matts_training import *
 
 
-def main():
-    # df = pd.read_csv('preVectorDATA/Player_Team_Lookups.csv') # player team lookups
-    '''
-    #copy = pd.DataFrame()
-    df = df[['NAME', 'ABBREV', 'SEASON','PLAYER_ID']] #restricting to necessary columns
-    copy = df # copy of df
-    copy["NEW"] = df[['ABBREV','SEASON']].apply(lambda row: '-'.join(row.values.astype(str)), axis=1) # create a new column that combines the team abbreviation and season
-    copy = copy[['NAME', 'NEW', 'PLAYER_ID']] #restrict columns to necessary
-    copy = copy.pivot(columns='NEW', values='NAME')
-    df1 = copy.apply(lambda x: pd.Series(x.dropna().to_numpy()))
-    df1.to_csv('TEAM_ROSTERS.csv')
-    '''
 
-    # data = pd.read_csv('GameDATA.csv')
-    # 
-    # 
-    # 
-    # #pd.reset_option('all')
-    # #print(df1.head(150))
-    # 
-    # 
-    #raptorfactory = RaptorVectorFactory()
-    #raptorfactory.team_vectors()
 
+def lucas():
     gamefact = GameDataFeatureFactory()
 
     gamefact.split_by_season()
@@ -46,45 +27,85 @@ def main():
     list = gamefact.create_features()
 
     train, test = gamefact.split_train_test(list)
+    #for season in train:
+        #print(len(season[0]))
 
     # Lucas Test Code ===================================================================
     traintrans = torch.transpose(train[0], 0, 1)
     traintrans = nn.functional.normalize(traintrans, 2, dim=0)
+    target_values = train[0][22]
 
     inFeats = len(traintrans[0])
     outFeats = 128
 
-    print(f'inFeats: {inFeats}')
-    print(f'traintrans: {traintrans}')
-    #print(train[0][0])
+    # print(f'inFeats: {inFeats}')
+    # print(f'traintrans: {traintrans}')
+    # print(train[0][0])
 
     lucas_model = LucasModel(inFeats, outFeats)
 
-    prediction = lucas_model.forward(traintrans)
+    # prediction = lucas_model.forward(traintrans)
 
-    print(prediction)
+    #trainLoop = TrainLoop(lucas_model, traintrans, target_values)
 
-    #print(f'Output Vals: {outputVals}')
-    #print(f'Output softmax values: {outputWeights}')
+    #for i in range(1000):
+    #    trainLoop.trainOnce()
 
-    #torch.set_printoptions(profile="full")
-    #print(f'First output val')
-    #torch.set_printoptions(profile="default")
+    #trainLoop.testPrediction(traintrans, target_values)
+    
+    # New Attention -------------------------------------------------
+    newInFeats = 24
+    newOutFeats = 128
+    lucas_new_model = LucasNewModel(newInFeats, newOutFeats)
+
+    newTrainData = train[0]
+    print(f'Len of new Data {len(newTrainData)}')
+
+    newTrainLoop = TrainLoopNew(lucas_new_model, newTrainData, target_values)
+
+    for i in range(len(newTrainData)):
+        trainRow = newTrainData[i]
+        targetRow = target_values[i]
+        newTrainLoop.newData(trainRow, targetRow)
+        newTrainLoop.trainOnce()
+
+    newTrainLoop.testPrediction(newTrainData[0], target_values[0])
+
+    # End New Attention ---------------------------------------------
+
+    # print(prediction)
+    # print(prediction.size())
+
+    # print(f'Output Vals: {outputVals}')
+    # print(f'Output softmax values: {outputWeights}')
+
+    # torch.set_printoptions(profile="full")
+    # print(f'First output val')
+    # torch.set_printoptions(profile="default")
 
     # End Lucas Test Code ===============================================================
 
 
-    # train = pd.read_csv('preVectorDATA/GameData.csv')
-    # test = pd.read_csv('preVectorDATA/GameData.csv')
 
-    # print(test)
-    # print(len(test))
+def matt():
+    # getDataMatt()
+    load_features()
+    print("Matt")
 
-    '''
-    tobey_train(train, test)
-    matt_train(train, test)
-    lucas_train(train, test)
-    '''
+
+
+def tobey():
+    print("Tobey")
+
+
+
+
+
+def main():
+    print("code started")
+    #matt()
+    lucas()
+    # tobey()
 
 
 # main()
