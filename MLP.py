@@ -2,8 +2,14 @@ from evalMetric import *
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.nn.functional as F
+from torch.utils.data import TensorDataset
+from torch.utils.data import DataLoader
 import csv
 import numpy as np
+import sklearn
+from sklearn.preprocessing import normalize
+import matplotlib.pyplot as plt
 
 
 class MLP(nn.Module):
@@ -24,11 +30,12 @@ class MLP(nn.Module):
         :return:
         """
         hidden = self.input_layer(input)
-        #print("hidden1: ", hidden.size())
+        hidden = F.relu(hidden)
         hidden = self.hidden_layer(hidden)
-        #print("hidden2: ", hidden.size())
+        hidden = F.relu(hidden)
+        hidden = self.hidden_layer(hidden)
+        hidden = F.relu(hidden)
         output = self.output_layer(hidden)
-        #print("output: ", output.size())
         return output
 
 
@@ -41,39 +48,129 @@ def trainMLP(model):
     """
 
 
-    # Define the loss function
-    train_data = data_load()
-    print(train_data[0].size())
-    print(train_data[1].size())
+
+    train_data, train_targets, test_data, test_targets = data_load()
+    print(train_data.size())
+    print(test_data.size())
+    print(train_targets.size())
+    print(test_targets.size())
+
+
+
+    # Create a TensorDataset from the training data and targets
+    train_dataset = TensorDataset(train_data, train_targets)
+
+    # Define the batch size
+    batch_size = 300
+
+    # Create a DataLoader for the training dataset
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
     # Define the optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.00001)
     # Iterate over the training data in batches
 
-    # input1 is the input data. each input1 is a te representing a games
-    # train_data[0] the entire data set including the target (21848x57)
-    # train_data[1] the target data (21848x1)
-
     loss_fn = torch.nn.MSELoss()
-    i = 0 #iteration counter
-    for input1 in train_data[0]:
-        i+=1
-        # Make predictions using the MLP model
-        output = model(train_data[0])
-        # Compute the loss between the predictions and the target values
+    lowest_loss = 1000000
+    lowest_test_loss = 1000000
+    num_epochs = 800
+    batch_list = []
+    loss_list = []
+    epoch_list = []
+    batch_count = 0
+    # Iterate over the training data in batches
+    for epoch in range(num_epochs):
+        for batch in train_loader:
+            batch_count += 1
+            # Extract the data and targets from the batch
+            data, targets = batch
+            # Forward pass: compute the predicted scores
+            scores = model(data)
+            # Compute the loss between the predictions and the target scores
+            loss = loss_fn(scores, targets)
+            # Zero the gradients
+            optimizer.zero_grad()
+            # Backpropagate the error
+            loss.backward()
+            # Update the model parameters
+            optimizer.step()
+            if loss.item() < lowest_loss:
+                lowest_loss = loss.item()
+                batch_list.append(batch_count)
+                loss_list.append(lowest_loss)
+                epoch_list.append(epoch)
+                plt.yscale("log")
+                plt.plot(batch_list,loss_list,'r')
+                plt.show()
+                torch.save(model.state_dict(), "models/MLP1.pt")
+                # Print the loss
+                print(f'Epoch {epoch}: Loss = {loss.item()}')
+            if lowest_loss<95:
+                break
 
-        loss = loss_fn(output, train_data[1][i])
-        print(i, " loss: ", loss.item())
-        # Zero the gradients
-        optimizer.zero_grad()
 
-        # Backpropagate the error
-        loss.backward()
 
-        # Update the model parameters
-        optimizer.step()
-        if(i>1000):
-            break
+# Define the model
+class CNN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv1d(56, 64, 1)  # Modify this line to output 32 channels
+        self.conv2 = nn.Conv1d(32, 64, 1)
+        self.fc1 = nn.Linear(64 * 4 * 4, 1024)
+        self.fc2 = nn.Linear(1024, 1)
+
+    def forward(self, x):
+
+        x = F.relu(self.conv1(x))
+        x = F.max_pool2d(x, 1, stride=2, dilation=1)
+        x = F.relu(self.conv2(x))
+        x = F.max_pool2d(x, 1, stride=2, dilation=1)
+        x = x.view(-1, 64 * 4 * 4)
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
+
+def trainCNN(model):
+    train_data, train_targets, test_data, test_targets = data_load()
+    train_data = torch.unsqueeze(train_data, dim=2)
+    train_targets = torch.unsqueeze(train_targets, dim=1)
+    train_dataset = TensorDataset(train_data, train_targets)
+
+    #batch_size = 32
+    # Define a DataLoader to provide mini-batches of data during training
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+
+
+    # Define the optimizer and loss function
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.00001)
+    loss_fn = nn.MSELoss()
+    lowest_loss = 10000
+    num_epochs = 500
+    # Train the model for a number of epochs
+    for epoch in range(num_epochs):
+        # Iterate over the mini-batches of data
+        count=0
+        for x_batch, y_batch in train_loader:
+            #print(x_batch.size())
+            if x_batch.size()[0] != 32:
+                #print("broken on: ", count)
+                break
+            #print(y_batch.size())
+            # Forward pass: compute predicted y by passing x to the model
+            count+=1
+            y_pred = model(x_batch)
+
+
+            # Compute and print loss
+            loss = loss_fn(y_pred, y_batch)
+            if loss.item() < lowest_loss:
+                lowest_loss = loss.item()
+                print(f"Epoch {epoch}: Loss = {loss.item()}")
+
+            # Zero gradients, perform a backward pass, and update the weights
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
 
 def data_load():
@@ -83,6 +180,29 @@ def data_load():
         data = np.array([[col for j, col in enumerate(row) if j > 0] for i, row in enumerate(reader) if i > 0],
                         dtype=np.float32)
 
+    #data = normalize(data,axis=0,norm='l1')
+    # Split the data into training and testing sets
+    train_data, train_targets = data[:16880, :], data[:16880, 23]
+    test_data, test_targets = data[16878:21500, :], data[16878:21500, 23]
+    train_data = np.delete(train_data,23,1)
+    test_data = np.delete(test_data,23,1)
+    # Convert the data into PyTorch tensors
+    train_data, train_targets = torch.from_numpy(train_data), torch.from_numpy(train_targets)
+    test_data, test_targets = torch.from_numpy(test_data), torch.from_numpy(test_targets)
 
-    # Convert the NumPy array into PyTorch tensors
-    return torch.from_numpy(data), torch.from_numpy(data[:, 23])
+    return train_data, train_targets, test_data, test_targets
+
+
+def test_model():
+    model = MLP(input_size=56, hidden_size=128, output_size=1)
+    model.load_state_dict(torch.load('models/MLP1.pt'))
+    model.eval()
+    train_data, train_targets, test_data, test_targets = data_load()
+
+    with torch.no_grad():
+        pred = model(test_data)
+        for i in range(len(test_data)):
+            print("pred: ", pred[i].item(), "act: ", test_targets[i].item())
+
+        loss_fn = torch.nn.MSELoss()
+        print("final: ", loss_fn(pred,test_targets))
