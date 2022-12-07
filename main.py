@@ -1,9 +1,9 @@
 # https://github.com/swar/nba_api
 # https://github.com/swar/nba_api/tree/master/docs/examples
 
-#from nba_api.stats.static import teams
-#from nba_api.stats.endpoints import leaguegamefinder
-#from nba_api.stats.static import teams
+from nba_api.stats.static import teams
+from nba_api.stats.endpoints import leaguegamefinder
+from nba_api.stats.static import teams
 
 #from call_library import *
 from FeatureVectorFactory import *
@@ -17,48 +17,8 @@ from SingleGameAttention import *
 from matts_training import *
 from AttentionTrain import *
 
+from MLP import *
 
-#def train_by_game(train, test):
-
-
-    # Training loop, runs through the whole training dataset
-    # count = 0
-    # epochs = 5
-    # for y in range(epochs):
-    #
-    #     for x in range(len(train)):
-    #         target_values = train[x][22]
-    #         newTrainData = torch.transpose(train[x], 0, 1)
-    #         newTrainData = nn.functional.normalize(newTrainData, 2, dim=0)
-    #         # print(f"Size of new data 2: {newTrainData.size()}")
-    #
-    #         for i in range(len(newTrainData)):
-    #             count += 1
-    #             trainRow = newTrainData[i]
-    #             targetRow = target_values[i]
-    #             newTrainLoop.newData(trainRow, targetRow)
-    #             loss, min_loss = newTrainLoop.trainOnce()
-    #             if count % 500 == 0:
-    #                 print(f"MSE Loss for step {count}: {loss}")
-    #                 print(f"Min Loss as of step {count}: {min_loss}")
-    #
-    #             if loss == -1:
-    #                 print(f"Delta Loss is below threshold, stopping training...")
-    #                 print(f"Min Loss as of step {count}: {min_loss}")
-    #
-    #                 testrows = torch.transpose(test[0], 0, 1)
-    #                 testrows = nn.functional.normalize(testrows, 2, dim=0)
-    #                 testtargets = test[0][22]
-    #                 for p in range(10):
-    #                     newTrainLoop.testPrediction(testrows[p], testtargets[p])
-    #
-    #                 return
-    #
-    # testrows = torch.transpose(test[0], 0, 1)
-    # testrows = nn.functional.normalize(testrows, 2, dim=0)
-    # testtargets = test[0][22]
-    # for i in range(10):
-    #     newTrainLoop.testPrediction(testrows[i], testtargets[i])
 
 
 
@@ -121,14 +81,20 @@ def lucas():
 
 
 def matt():
-    # getDataMatt()
-    load_features()
     print("Matt")
+    # getDataMatt()
+    # feedForward()
+    train_the_model_lstm()
+    # test_the_model()
+
 
 
 
 def tobey():
-    print("Tobey")
+    mlp = MLP(input_size=57, hidden_size=32, output_size=1)
+    trainMLP(mlp)
+    print("Tobey - code started")
+
 
 
 
