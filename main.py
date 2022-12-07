@@ -89,9 +89,12 @@ def lucas():
 
 
 def matt():
-    # getDataMatt()
-    feedForward()
     print("Matt")
+    # getDataMatt()
+    # feedForward()
+    train_the_model_lstm()
+    # test_the_model()
+
 
 
 
