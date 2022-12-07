@@ -50,7 +50,7 @@ def trainMLP(model):
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
     # Iterate over the training data in batches
 
-    # input1 is the input data. each input1 is a tensor of size 57 representing a game
+    # input1 is the input data. each input1 is a te representing a games
     # train_data[0] the entire data set including the target (21848x57)
     # train_data[1] the target data (21848x1)
 
