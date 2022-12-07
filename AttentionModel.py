@@ -114,8 +114,8 @@ class BasicPredictionLayer(nn.Module):
 
     def forward(self, attention_data):
         revProj = self.reverseProjection(attention_data)
-        denorm = nn.functional.normalize(revProj, 1/2, dim=0)
-        return self.predictRow(self.activationLayer(denorm))
+        #denorm = nn.functional.normalize(revProj, 1/2, dim=0)
+        return self.predictRow(revProj)#self.activationLayer(revProj))
 
 
 class LucasModel(nn.Module):

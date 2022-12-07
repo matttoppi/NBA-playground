@@ -73,11 +73,17 @@ def lucas():
 
     newInFeats = 24
     newOutFeats = 128
-    max_epochs = 10
+    max_epochs_games = 10
+    max_epochs_seasons = 50
+    loss_threshold = 10
     target_values = train[0][22]
     lucas_new_model = LucasNewModel(newInFeats, newOutFeats)
+    season_model = LucasModel(newInFeats, newOutFeats)
 
-    newTrainLoop = TrainLoop(lucas_new_model, train[0], target_values, max_epochs)
+    newTrainLoop = TrainLoop(season_model, train, target_values, max_epochs_seasons,
+                            model_type="season", loss_threshold=loss_threshold)
+    #newTrainLoop = TrainLoop(lucas_new_model, train, target_values, max_epochs_games,
+    #                         model_type="game", loss_threshold=loss_threshold)
 
     newTrainLoop.train_multi_epoch()
     newTrainLoop.create_plots()
@@ -129,7 +135,6 @@ def tobey():
 
 
 def main():
-    print("code started")
     #matt()
     lucas()
     # tobey()
