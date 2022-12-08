@@ -62,7 +62,7 @@ def trainMLP(model):
     train_dataset = TensorDataset(train_data, train_targets)
 
     # Define the batch size
-    batch_size = 300
+    batch_size = 64
 
     # Create a DataLoader for the training dataset
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -79,6 +79,7 @@ def trainMLP(model):
     loss_list = []
     epoch_list = []
     batch_count = 0
+
     # Iterate over the training data in batches
     for epoch in range(num_epochs):
         for batch in train_loader:
@@ -95,6 +96,9 @@ def trainMLP(model):
             loss.backward()
             # update model parameters
             optimizer.step()
+
+            if batch_count % 30 == 0:
+                plt.show()
             if loss.item() < lowest_loss:
                 lowest_loss = loss.item()
                 batch_list.append(batch_count)
@@ -147,7 +151,7 @@ def trainCNN(model):
 
 
     # Define DataLoader
-    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=False)
 
 
     # Define the optimizer and loss function
