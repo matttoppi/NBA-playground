@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+#from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from torch.autograd import Variable
 
 input_file = "preVectorDATA/ALL_GAME_DATA.csv"

@@ -24,6 +24,8 @@ class BasicProjectionLayer(nn.Module):
         self.in_features_from_gamedata = in_feats_from_gamedata
         self.out_features_from_gamedata = out_feats_from_gamedata
         self.raw_gamedata_projection_layer = nn.Linear(self.in_features_from_gamedata, self.out_features_from_gamedata)
+        self.sigmoid = nn.Sigmoid()
+        self.lin2 = nn.Linear(self.out_features_from_gamedata, self.out_features_from_gamedata)
 
     def forward(self, in_feats):
         """
@@ -33,7 +35,7 @@ class BasicProjectionLayer(nn.Module):
         :return: A latent-space vector matrix of the game data
         """
         #print(f'In: {self.in_features_from_gamedata}; Out: {self.out_features_from_gamedata}')
-        return self.raw_gamedata_projection_layer(in_feats)
+        return self.lin2(self.sigmoid(self.raw_gamedata_projection_layer(in_feats)))
 
 
 class BasicAttentionLayer(nn.Module):
@@ -109,13 +111,13 @@ class BasicPredictionLayer(nn.Module):
     def __init__(self):
         super(BasicPredictionLayer, self).__init__()
         self.reverseProjection = nn.Linear(128, 24)
-        self.activationLayer = nn.Softmax()
+        self.activationLayer = nn.Sigmoid()
         self.predictRow = nn.Linear(24, 1)
 
     def forward(self, attention_data):
         revProj = self.reverseProjection(attention_data)
         #denorm = nn.functional.normalize(revProj, 1/2, dim=0)
-        return self.predictRow(revProj)#self.activationLayer(revProj))
+        return self.predictRow(self.activationLayer(revProj))
 
 
 class LucasModel(nn.Module):
@@ -141,11 +143,13 @@ class LucasModel(nn.Module):
 
     def forward(self, input_data):
         projections = self.projection(input_data)  # Projecting the data into a latent space
+        #print("Projections from model: ", projections)
         #print(f'Projections size: {projections.size()}')
 
-        attentionScores, softmaxVals = self.attention(projections, projections, projections)
+        #attentionScores, softmaxVals = self.attention(projections, projections, projections)
 
-        predictions = self.prediction(attentionScores)
+        predictions = self.prediction(projections)#attentionScores)
+        #print("Predictions from model ", predictions)
 
         return predictions
 

@@ -10,7 +10,7 @@ class TrainLoop:
     This class is a general-purpose training loop that will work for either of my Attention-based models.
     """
 
-    def __init__(self, MyModel, input_data, target_data, max_epochs,
+    def __init__(self, MyModel, data_loader, max_epochs,
                  model_type="game", loss_threshold=50, train_mode=1, optimizer="SGD"):
         # Initialize tracking variables
         self.epochs = 0
@@ -30,6 +30,9 @@ class TrainLoop:
         self.hidden_predictions = []
         self.hidden_targets = []
 
+        self.data_loader = data_loader  # New
+        self.batch_count = 0
+
         # Loading pre-trained model to test on if not in train mode
         if model_type == "game" and self.train_mode == 0:
             self.model.load_state_dict(torch.load('models/AttentionPerGame.pt'))
@@ -39,17 +42,17 @@ class TrainLoop:
             self.model.eval()
 
         # Assign train and target
-        self.input_data = input_data
-        self.target_data = target_data
+        #self.input_data = input_data
+        #self.target_data = target_data
         self.current_input = None
         self.current_target = None
 
         # Set up loss function and optimizer
         self.loss_function = nn.MSELoss()
         if optimizer == "Adam":
-            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.0001)
+            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.000001)
         else:
-            self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.0001)
+            self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.000001)
 
     def newData(self, newInput, newTarget):
         self.current_input = newInput
@@ -79,6 +82,9 @@ class TrainLoop:
         """
 
         output = self.feed_model()
+
+        #print(output)
+
         loss = self.loss_function(output, self.current_target)
 
         loss.backward()
@@ -127,7 +133,12 @@ class TrainLoop:
             for x in range(len(self.input_data)):  # Loop through all seasons
                 print("Now training on season ", x + 1, "...")
                 target_values = self.input_data[x][22]  # Get target values column
-                newTrainData = torch.transpose(self.input_data[x], 0, 1)  # Transpose the seasons to be games x features
+
+                mask = torch.zeros(len(self.input_data[x][22]))
+                score_cleared_input = torch.clone(self.input_data[x])
+                score_cleared_input[22] = mask
+
+                newTrainData = torch.transpose(score_cleared_input, 0, 1)  # Transpose the seasons to be games x features
                 newTrainData = nn.functional.normalize(newTrainData, 2, dim=0)  # Normalize the data per row/game
 
                 # Feed model in loop
@@ -149,31 +160,56 @@ class TrainLoop:
 
 
         else:  # Training for season model
-            for x in range(len(self.input_data)):  # Loop through all seasons
-                print("Now training on season ", x + 1, "...")
-                target_values = self.input_data[x][22]  # Get target values column MIGHT BE DIM 2, AND MIGHT NEED TRANS
-                mask = torch.zeros(len(self.input_data[x][22]))
-                score_cleared_input = torch.clone(self.input_data[x])
-                score_cleared_input[22] = mask
+            # for x in range(len(self.input_data)):  # Loop through all seasons
+            #     print("Now training on season ", x + 1, "...")
+            #     target_values = self.input_data[x][22]  # Get target values column MIGHT BE DIM 2, AND MIGHT NEED TRANS
+            #     mask = torch.zeros(len(self.input_data[x][22]))
+            #     score_cleared_input = torch.clone(self.input_data[x])
+            #     score_cleared_input[22] = mask
+            #
+            #     # TODO: Put mask into games train and try that, print weights to see why all output is the same
+            #
+            #     #print("Score cleared: ", score_cleared_input)
+            #     #print("Targets: ", self.input_data[x][22])
+            #     trans_input = torch.transpose(score_cleared_input, 0, 1)  # Transpose the seasons to be games x features
+            #     norm_input = nn.functional.normalize(trans_input, 2, dim=0)  # Normalize the data per row/game
+            #     # torch.set_printoptions(profile="full")
+            #     # print(norm_input)
+            #     # torch.set_printoptions(profile="default")
+            #     self.newData(norm_input, target_values)
+            #
+            #     self.feed_model()
+            #
+            #     loss = self.update_model(x)
+            #
+            #     self.mse_data.append(loss)
+            #     self.min_loss_data.append(self.min_loss)
+            #
+            #     if self.min_loss < self.loss_threshold:
+            #         return
 
-                # TODO: Put mask into games train and try that, print weights to see why all output is the same
+            for batch in self.data_loader:
+                self.batch_count += 1
+                # Extract the data and targets from the batch
+                data, targets = batch
+                # Forward pass: compute the predicted scores
+                scores = self.model(data)
+                # Compute the loss between the predictions and the target scores
+                loss = self.loss_function(scores, targets)
+                # Zero the gradients
+                self.optimizer.zero_grad()
+                # Backpropagate the error
+                loss.backward()
+                # Update the model parameters
+                self.optimizer.step()
+                if loss.item() < self.min_loss:
+                    self.min_loss = loss.item()
+                    print("New Lowest Loss!")
+                    print("Scores: ", scores)
+                    print("Targets: ", targets)
 
-                #print("Score cleared: ", score_cleared_input)
-                #print("Targets: ", self.input_data[x][22])
-                trans_input = torch.transpose(score_cleared_input, 0, 1)  # Transpose the seasons to be games x features
-                norm_input = nn.functional.normalize(trans_input, 2, dim=0)  # Normalize the data per row/game
-                #print(norm_input.size())
-                self.newData(norm_input, target_values)
-
-                self.feed_model()
-
-                loss = self.update_model(x)
-
-                self.mse_data.append(loss)
-                self.min_loss_data.append(self.min_loss)
-
-                if self.min_loss < self.loss_threshold:
-                    return
+                if self.min_loss < 95:
+                    break
 
     def train_multi_epoch(self):
         for x in range(self.max_epochs):

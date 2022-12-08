@@ -148,8 +148,8 @@ class LucasNewModel(nn.Module):
         projections = self.projection(input_data)  # Projecting the data into a latent space
         #print(f'Projections size: {projections.size()}')
 
-        attentionScores, softmaxVals = self.attention(projections, projections, projections)
+        #attentionScores, softmaxVals = self.attention(projections, projections, projections)
 
-        predictions = self.prediction(attentionScores)
+        predictions = self.prediction(projections)#attentionScores)
 
         return predictions

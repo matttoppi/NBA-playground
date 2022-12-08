@@ -7,8 +7,8 @@ from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader
 import csv
 import numpy as np
-import sklearn
-from sklearn.preprocessing import normalize
+#import sklearn
+#from sklearn.preprocessing import normalize
 import matplotlib.pyplot as plt
 
 
