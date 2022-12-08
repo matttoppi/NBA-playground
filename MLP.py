@@ -23,9 +23,10 @@ class MLP(nn.Module):
         self.hidden_layer = nn.Linear(hidden_size, hidden_size)
         self.output_layer = nn.Linear(hidden_size, output_size)
 
+
     def forward(self, input):
         """
-
+        2 hidden layers with ReLi activation functions
         :param input:
         :return:
         """
@@ -61,14 +62,14 @@ def trainMLP(model):
     train_dataset = TensorDataset(train_data, train_targets)
 
     # Define the batch size
-    batch_size = 300
+    batch_size = 64
 
     # Create a DataLoader for the training dataset
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
     # Define the optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=0.00001)
-    # Iterate over the training data in batches
+
 
     loss_fn = torch.nn.MSELoss()
     lowest_loss = 1000000
@@ -78,34 +79,42 @@ def trainMLP(model):
     loss_list = []
     epoch_list = []
     batch_count = 0
+
     # Iterate over the training data in batches
     for epoch in range(num_epochs):
         for batch in train_loader:
             batch_count += 1
-            # Extract the data and targets from the batch
+            # extract data and targets from the batch
             data, targets = batch
-            # Forward pass: compute the predicted scores
+            #compute the predicted scores
             scores = model(data)
-            # Compute the loss between the predictions and the target scores
+            #compute the loss
             loss = loss_fn(scores, targets)
-            # Zero the gradients
+            #zero the gradients
             optimizer.zero_grad()
-            # Backpropagate the error
+            # backpropagate the error
             loss.backward()
-            # Update the model parameters
+            # update model parameters
             optimizer.step()
+
+            if batch_count % 30 == 0:
+                plt.show()
             if loss.item() < lowest_loss:
                 lowest_loss = loss.item()
                 batch_list.append(batch_count)
                 loss_list.append(lowest_loss)
                 epoch_list.append(epoch)
+
+
+
                 plt.yscale("log")
-                plt.plot(batch_list,loss_list,'r')
+                if lowest_loss < 10000: #avoid sharp drop in loss graph
+                    plt.plot(batch_list, loss_list, 'r')
                 plt.show()
                 torch.save(model.state_dict(), "models/MLP1.pt")
                 # Print the loss
                 print(f'Epoch {epoch}: Loss = {loss.item()}')
-            if lowest_loss<95:
+            if lowest_loss<95: #hard stop to avoid overfitting
                 break
 
 
@@ -120,7 +129,11 @@ class CNN(nn.Module):
         self.fc2 = nn.Linear(1024, 1)
 
     def forward(self, x):
-
+        """
+        CNN with max pooling and ReLu
+        :param x:
+        :return:
+        """
         x = F.relu(self.conv1(x))
         x = F.max_pool2d(x, 1, stride=2, dilation=1)
         x = F.relu(self.conv2(x))
@@ -133,18 +146,20 @@ class CNN(nn.Module):
 def trainCNN(model):
     train_data, train_targets, test_data, test_targets = data_load()
     train_data = torch.unsqueeze(train_data, dim=2)
-    train_targets = torch.unsqueeze(train_targets, dim=1)
+    train_targets = torch.unsqueeze(train_targets, dim=1) #fix dimensionality
     train_dataset = TensorDataset(train_data, train_targets)
 
-    #batch_size = 32
-    # Define a DataLoader to provide mini-batches of data during training
-    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+
+    # Define DataLoader
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=False)
 
 
     # Define the optimizer and loss function
     optimizer = torch.optim.Adam(model.parameters(), lr=0.00001)
     loss_fn = nn.MSELoss()
-    lowest_loss = 10000
+
+
+    lowest_loss = 10000 #arbitrary lowest loss
     num_epochs = 500
     # Train the model for a number of epochs
     for epoch in range(num_epochs):
@@ -180,13 +195,13 @@ def data_load():
         data = np.array([[col for j, col in enumerate(row) if j > 0] for i, row in enumerate(reader) if i > 0],
                         dtype=np.float32)
 
-    #data = normalize(data,axis=0,norm='l1')
+
     # Split the data into training and testing sets
     train_data, train_targets = data[:16880, :], data[:16880, 23]
     test_data, test_targets = data[16878:21500, :], data[16878:21500, 23]
     train_data = np.delete(train_data,23,1)
     test_data = np.delete(test_data,23,1)
-    # Convert the data into PyTorch tensors
+    # Convert data into PyTorch tensors
     train_data, train_targets = torch.from_numpy(train_data), torch.from_numpy(train_targets)
     test_data, test_targets = torch.from_numpy(test_data), torch.from_numpy(test_targets)
 
@@ -205,4 +220,4 @@ def test_model():
             print("pred: ", pred[i].item(), "act: ", test_targets[i].item())
 
         loss_fn = torch.nn.MSELoss()
-        print("final: ", loss_fn(pred,test_targets))
+        print("final: ", loss_fn(pred, test_targets))
