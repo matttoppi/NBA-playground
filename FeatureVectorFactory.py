@@ -343,8 +343,8 @@ class GameDataFeatureFactory:
         return seasonstensorlist
 
     def split_train_test(self, seasontensorlist):
-        train = seasontensorlist[:7]
-        test = seasontensorlist[7:]
+        train = seasontensorlist[:8]
+        test = seasontensorlist[8:]
         # print(f'Train: {train}')
         # print(f'Test: {test}')
 

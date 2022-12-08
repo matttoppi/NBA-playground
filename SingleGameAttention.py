@@ -32,7 +32,7 @@ class BasicProjectionLayer(nn.Module):
         batched by season, so the in_feats input would only be data from one season, so shape (1, 30, 23) or (30, 23)
         :return: A latent-space vector matrix of the game data
         """
-        #print(f'In: {self.in_features_from_gamedata}; Out: {self.out_features_from_gamedata}')
+        #print(f"Size of in features to project: {in_feats.size()}")
         return self.raw_gamedata_projection_layer(in_feats)
 
 
@@ -68,30 +68,35 @@ class BasicAttentionLayer(nn.Module):
         scale_value = math.sqrt(self.layer_dims)
 
         # Transpose key
-        key_transpose = torch.transpose(key, -2, -1)
+        key_transpose = torch.transpose(key, 0, -1)
+
         #print(f'query size: {query.size()}')
         #torch.set_printoptions(profile="full")
         #print(query[0])
         #torch.set_printoptions(profile="default")
+
         # Calculate the query dot key score
-        scores = torch.matmul(query, key_transpose)
+        scores = torch.mul(query, key_transpose)
+
         #print("Before softmax")
         #print(scores.size())
         #print(scores)
 
         scores = scores / scale_value
+
         #print("After scaling")
         #print(scores)
 
         # Send the score through a softmax
         softmaxed_score = self.softmax(scores)
+
         #print("After softmax")
         #torch.set_printoptions(profile="full")
         #print(softmaxed_score[0])
         #torch.set_printoptions(profile="default")
 
         # Return the attention matrix along with the softmax scores for the matrix
-        return torch.matmul(softmaxed_score, value), softmaxed_score
+        return torch.mul(softmaxed_score, value), softmaxed_score
 
     def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor):
         """
@@ -148,48 +153,3 @@ class LucasNewModel(nn.Module):
         predictions = self.prediction(attentionScores)
 
         return predictions
-
-
-class TrainLoopNew:
-    """
-
-    """
-
-    def __init__(self, MyModel, train_data, target_data):
-        self.epochs = 0
-        self.total_loss = 0
-        self.model = MyModel
-        self.train_data = train_data
-        self.target_data = target_data
-        self.loss_function = nn.MSELoss()
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.001)
-
-    def newData(self, newTrain, newTarget):
-        self.train_data = newTrain
-        self.target_data = newTarget
-
-
-    def trainOnce(self):
-        """
-
-        """
-
-        self.optimizer.zero_grad()
-        ouput = self.model.forward(self.train_data)
-
-        loss = self.loss_function(ouput, self.target_data)
-
-        print(loss.item())
-
-        loss.backward()
-
-        self.optimizer.step()
-
-        self.total_loss += loss.item()
-
-    def testPrediction(self, fakeInput, actualValues):
-        output = self.model.forward(fakeInput)
-
-        print(f"Predicted: {output}")
-        print(f"Actual: {actualValues}")
-        print(f"Error: {output - actualValues}")

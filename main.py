@@ -15,6 +15,8 @@ from Training import *
 from AttentionModel import *
 from SingleGameAttention import *
 from matts_training import *
+from AttentionTrain import *
+
 from MLP import *
 
 
@@ -28,13 +30,32 @@ def lucas():
     list = gamefact.create_features()
 
     train, test = gamefact.split_train_test(list)
+
+    newInFeats = 24
+    newOutFeats = 128
+    max_epochs_games = 10
+    max_epochs_seasons = 50
+    loss_threshold = 10
+    target_values = train[0][22]
+    lucas_new_model = LucasNewModel(newInFeats, newOutFeats)
+    season_model = LucasModel(newInFeats, newOutFeats)
+
+    newTrainLoop = TrainLoop(season_model, train, target_values, max_epochs_seasons,
+                            model_type="season", loss_threshold=loss_threshold)
+    #newTrainLoop = TrainLoop(lucas_new_model, train, target_values, max_epochs_games,
+    #                         model_type="game", loss_threshold=loss_threshold)
+
+    newTrainLoop.train_multi_epoch()
+    newTrainLoop.create_plots()
+
     #for season in train:
         #print(len(season[0]))
 
     # Lucas Test Code ===================================================================
-    traintrans = torch.transpose(train[0], 0, 1)
-    traintrans = nn.functional.normalize(traintrans, 2, dim=0)
-    target_values = train[0][22]
+
+    #traintrans = torch.transpose(train[0], 0, 1)
+    #traintrans = nn.functional.normalize(traintrans, 2, dim=0)
+    #target_values = train[0][22]
 
     #inFeats = len(traintrans[0])
     #outFeats = 128
@@ -53,36 +74,7 @@ def lucas():
     #    trainLoop.trainOnce()
 
     #trainLoop.testPrediction(traintrans, target_values)
-    
-    # New Attention -------------------------------------------------
-    newInFeats = 24
-    newOutFeats = 128
-    lucas_new_model = LucasNewModel(newInFeats, newOutFeats)
 
-    newTrainData = train[0]
-    print(f'Len of new Data {len(newTrainData)}')
-
-    newTrainLoop = TrainLoopNew(lucas_new_model, newTrainData, target_values)
-
-    for i in range(len(newTrainData)):
-        trainRow = newTrainData[i]
-        targetRow = target_values[i]
-        newTrainLoop.newData(trainRow, targetRow)
-        newTrainLoop.trainOnce()
-
-    newTrainLoop.testPrediction(newTrainData[0], target_values[0])
-
-    # End New Attention ---------------------------------------------
-
-    # print(prediction)
-    # print(prediction.size())
-
-    # print(f'Output Vals: {outputVals}')
-    # print(f'Output softmax values: {outputWeights}')
-
-    # torch.set_printoptions(profile="full")
-    # print(f'First output val')
-    # torch.set_printoptions(profile="default")
 
     # End Lucas Test Code ===============================================================
 
@@ -109,9 +101,8 @@ def tobey():
 
 
 def main():
-    print("code started")
-    matt()
-    # lucas()
+    #matt()
+    lucas()
     # tobey()
 
 
